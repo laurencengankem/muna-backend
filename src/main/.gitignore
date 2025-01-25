@@ -1,0 +1,11 @@
+# after editing gitignore file run the following commqnds in the root folder
+# git rm -rf --cached .    : for removing cached version of git ignore
+# git add .                : for adding new gitignore file
+# git commit -m "git ignore"
+# git push
+
+
+
+
+
+

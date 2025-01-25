@@ -1,0 +1,61 @@
+---
+
+
+jwt:
+  secret: mysecret
+
+server:
+  port: 9000
+
+
+# mail sender config
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ngankemlaurence@gmail.com
+    password: qanwxizaquorxzbx
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/muna
+    #url: jdbc:mysql://localhost:3306/kulvida
+    username: root
+    #password: root
+    password: moun@
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+    ## Hibernate Properties
+    ## The SQL dialect makes Hibernate generate better SQL for the chosen database
+    properties:
+      hibernate:
+        dialect : org.hibernate.dialect.MySQL5InnoDBDialect
+
+
+#paypal config
+paypal:
+  mode: sandbox
+  client:
+    id: AWMpiyTMvENb5KJz3R15RXHlUGObbD50SFvl6Ng7DfZLcW_oYx6LC6GckgkJwI7hQE5u-KvCWnIs_Kx4
+    secret: EFZpWc2g9btWzM6z46GI1jCeAlxo9sQJhCHLTdNKqNOt_2cF9OQ8Tx9mr-pmHG4V6LMLSDint3a3cpmL
+
+# logs configuration
+logging:
+  file:
+    path: /root/logs
+    name: /root/logs/kulvida.log
+  level:
+    root: INFO
+
+  logback:
+    rollingpolicy:
+      file-name-pattern: /root/logs/kulvida.%d{yyyy-MM-dd}.%i.log
