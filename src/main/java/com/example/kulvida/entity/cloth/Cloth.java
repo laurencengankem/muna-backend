@@ -32,6 +32,7 @@ public class Cloth implements Comparable, Serializable {
     private Integer discount=0;
     private Sex sex;
     private String brand;
+    private String location;
 
     @ManyToOne
     @JoinColumn(name = "CATEGORY_ID")

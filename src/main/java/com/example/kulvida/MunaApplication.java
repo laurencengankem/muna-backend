@@ -9,10 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Slf4j
 @SpringBootApplication
-public class KulvidaApplication {
+public class MunaApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(KulvidaApplication.class, args);
+		SpringApplication.run(MunaApplication.class, args);
 	}
 
 	@Bean

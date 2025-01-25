@@ -10,6 +10,8 @@ public class ClothAvailability extends ClothDto {
 
     private String requestedSize;
     private Double requestedPrice;
+    private String availableSizes="";
+    private String location;
     private int quantity;
 
     public ClothAvailability(Cloth cloth) {

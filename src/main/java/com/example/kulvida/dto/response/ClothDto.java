@@ -18,6 +18,7 @@ public class ClothDto {
     private Integer discount=0;
     private Sex sex;
     private String brand;
+    private String location;
     private String category;
     private List<ClothPicture> pictures;
     private boolean available;
@@ -34,6 +35,7 @@ public class ClothDto {
         pictures=cloth.getPictures();
         available= cloth.getAvailable();
         brand= cloth.getBrand();
+        location= cloth.getLocation();
         if(cloth.getClothSizes()!=null){
             for(ClothSize cs: cloth.getClothSizes()){
                 SizeRequest srq=new SizeRequest(cs.getSize().getName(),cs.getQuantity(),cs.getPrice());

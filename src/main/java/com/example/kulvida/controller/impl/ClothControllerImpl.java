@@ -163,6 +163,8 @@ public class ClothControllerImpl implements ClothController {
                 item.setBrand(request.getBrand().toUpperCase(Locale.ROOT));
             if(request.getSex()!=null)
                 item.setSex(request.getSex());
+            if(request.getLocation()!=null)
+                item.setLocation(request.getLocation());
             if(request.getCategory()!=null){
                 Category category= categoryRepository.findByName(request.getCategory().toUpperCase(Locale.ROOT));
                 if(category==null){
@@ -339,8 +341,20 @@ public class ClothControllerImpl implements ClothController {
             cla.setRequestedSize(size);
             boolean available=false;
             if(cloth!=null){
+                cla.setLocation(cloth.getLocation());
                 for(SizeRequest sr: cla.getSizes()){
-                    if(sr.getName().equalsIgnoreCase(size)){
+                    if(size.isEmpty()){
+                        cla.setRequestedSize(null);
+                        cla.setRequestedPrice(null);
+                        if(sr.getQuantity()>0){
+                            available= true;
+                            if(cla.getAvailableSizes().isEmpty())
+                                cla.setAvailableSizes(sr.getName());
+                            else cla.setAvailableSizes(cla.getAvailableSizes()+", "+sr.getName());
+                        }
+
+                    }
+                    else if(sr.getName().equalsIgnoreCase(size)){
                         cla.setQuantity(sr.getQuantity());
                         if(sr.getQuantity()==0)
                             cla.setOutOfStock(true);

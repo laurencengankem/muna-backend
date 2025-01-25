@@ -13,6 +13,7 @@ public class ClothUpdateRequest {
     private Integer discount;
     private String category;
     private String brand;
+    private String location;
     private Sex sex;
     private List<SizeRequest> sizes;
     private Boolean available;
