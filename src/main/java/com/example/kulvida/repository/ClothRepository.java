@@ -27,10 +27,16 @@ public interface ClothRepository extends JpaRepository<Cloth, Integer> {
 
     @Query("SELECT c FROM Cloth c WHERE " +
             "(:input IS NULL OR " +
+            "LOWER(c.code) LIKE LOWER(CONCAT('%', :input, '%')) OR "+
             "LOWER(c.name) LIKE LOWER(CONCAT('%', :input, '%')) OR " +
             "LOWER(c.category.name) LIKE LOWER(CONCAT('%', :input, '%')) OR " +
             "LOWER(c.description) LIKE LOWER(CONCAT('%', :input, '%')))")
     List<Cloth> searchByInput(@Param("input") String input);
 
     List<Cloth> findByCategoryAndSex(Category category, Sex sex);
+
+    Cloth findByCode(String code);
+
+    @Query("select c from Cloth c where c.code is null")
+    List<Cloth> findClothesWithCodeNull();
 }

@@ -24,7 +24,9 @@ import com.example.kulvida.utils.ReceipMunaUtil;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
@@ -81,6 +83,9 @@ public class OperatorControllerImpl implements OperatorController {
     @Autowired
     RandomGeneratorUtil randomGeneratorUtil;
 
+    @Autowired
+    private PasswordEncoder bcryptEncoder;
+
 
     private SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
 
@@ -91,11 +96,11 @@ public class OperatorControllerImpl implements OperatorController {
         if(!userRepo.existsByUsername(request.getEmail())) {
             log.info("{}", request);
 
-            int max = 999999;
-            int min = 100000;
-            int random_int = (int) Math.floor(Math.random() * (max - min + 1) + min);
+            //int max = 999999;
+            //int min = 100000;
+            //int random_int = (int) Math.floor(Math.random() * (max - min + 1) + min);
 
-            User user= new User(request.getEmail(),random_int+"");
+            User user= new User(request.getEmail(),request.getPassword());
             user.setFirstName(request.getFirstName());
             user.setLastName(request.getLastName());
             user.setStatus("ACTIVE");
@@ -111,7 +116,7 @@ public class OperatorControllerImpl implements OperatorController {
             String body = "Hello! Your account has been successfully created.\n \n" +
                     "ROLE: "+ user.getRole().getValue()+ "\n"+
                     "USERNAME: "+ user.getUsername()+ "\n"+
-                    "PASSWORD: " + random_int;
+                    "PASSWORD: " + request.getPassword();
             senderService.sendEmail(request.getEmail(), subject, body);
 
             return true;
@@ -131,6 +136,27 @@ public class OperatorControllerImpl implements OperatorController {
             else user.setStatus("ACTIVE");
             user.setUpdatedOn(new Date());
             userRepo.save(user);
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean editUserPassword(@RequestBody SendEmailRequest request){
+        User user = userRepo.findByUsername(request.getEmail());
+        if(user!=null && user.getRole().getValue().equals("OPERATOR")){
+            user.setPassword(bcryptEncoder.encode(request.getPassword()));
+            user.setUpdatedOn(new Date());
+            userRepo.save(user);
+
+            String subject = "Mot De Passe Modifié";
+            String body = "Votre Mot De Passe a été Modifié. " +
+                    "Vos données d'accès au système Muna sont désormais celles ci-dessous.\n \n" +
+                    "USERNAME: "+ user.getUsername()+ "\n"+
+                    "PASSWORD: " + request.getPassword();
+            senderService.sendEmail(request.getEmail(), subject, body);
+
             return true;
         }
         return false;

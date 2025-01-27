@@ -19,6 +19,7 @@ public class AddItemRequest {
     private Sex sex;
     private String brand;
     private String location;
+    private String code;
     private List<SizeRequest> sizes;
 
 }

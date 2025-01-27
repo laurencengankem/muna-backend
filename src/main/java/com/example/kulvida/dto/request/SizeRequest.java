@@ -1,6 +1,5 @@
 package com.example.kulvida.dto.request;
 
-import com.example.kulvida.entity.cloth.Cloth;
 import com.example.kulvida.entity.cloth.ClothSize;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +13,7 @@ public class SizeRequest implements Comparable<SizeRequest>{
 
     private String  name;
     private Integer quantity;
+    private String location;
     private Double price;
 
 
@@ -21,6 +21,7 @@ public class SizeRequest implements Comparable<SizeRequest>{
         this.name=cs.getSize().getName();
         this.quantity= cs.getQuantity();
         this.price= cs.getPrice();
+        this.location= cs.getLocation();
 
     }
 

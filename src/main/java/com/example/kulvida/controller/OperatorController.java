@@ -21,6 +21,10 @@ public interface OperatorController {
     @CrossOrigin
     boolean  updateUserStatus(@RequestBody SendEmailRequest request);
 
+    @PostMapping("/admin/editUserPassword")
+    @CrossOrigin
+    boolean editUserPassword(@RequestBody SendEmailRequest request);
+
 
     @GetMapping("/admin/getUserList")
     @CrossOrigin

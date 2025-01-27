@@ -4,6 +4,7 @@ import com.example.kulvida.dto.request.*;
 import com.example.kulvida.dto.response.AddItemListResponse;
 import com.example.kulvida.dto.response.ClothDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -77,6 +78,11 @@ public interface ClothController {
             @PathVariable String sex,
             @PathVariable String category
     );
+
+
+    @GetMapping("item/setCodes")
+    @CrossOrigin
+    ResponseEntity<?> setProductCode();
 
 
 }

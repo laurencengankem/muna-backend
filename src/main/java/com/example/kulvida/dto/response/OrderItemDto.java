@@ -14,11 +14,13 @@ public class OrderItemDto {
     private Integer quantity;
     private Double price;
     private Double total;
+    private String code;
 
     public OrderItemDto(OrderItem item){
         this.item= item.getCloth().getName();
         this.quantity= item.getQuantity();
         this.price= item.getPrice();
         this.total= item.getSubTotal();
+        this.code= item.getCloth().getCode();
     }
 }

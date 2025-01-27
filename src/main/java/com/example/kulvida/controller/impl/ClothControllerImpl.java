@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -95,6 +96,7 @@ public class ClothControllerImpl implements ClothController {
                         category= categoryRepository.saveAndFlush(new Category(request.getCategory().toUpperCase(Locale.ROOT)));
                     item.setCategory(category);
                 }
+                item.setCode(item.getCode().toUpperCase(Locale.ROOT));
                 item.setCreationDate(new GregorianCalendar());
                 item=clothRepository.save(item);
                 if(request.getSizes()!=null && !request.getSizes().isEmpty()){
@@ -114,6 +116,7 @@ public class ClothControllerImpl implements ClothController {
                         clothSize.setCloth(item);
                         clothSize.setPrice(s.getPrice());
                         clothSize.setQuantity(s.getQuantity());
+                        clothSize.setLocation(s.getLocation());
                         clothSizeList.add(clothSize);
                     }
                     clothSizeRepository.saveAll(clothSizeList);
@@ -163,8 +166,8 @@ public class ClothControllerImpl implements ClothController {
                 item.setBrand(request.getBrand().toUpperCase(Locale.ROOT));
             if(request.getSex()!=null)
                 item.setSex(request.getSex());
-            if(request.getLocation()!=null)
-                item.setLocation(request.getLocation());
+            if(request.getCode()!=null)
+                item.setCode(request.getCode());
             if(request.getCategory()!=null){
                 Category category= categoryRepository.findByName(request.getCategory().toUpperCase(Locale.ROOT));
                 if(category==null){
@@ -189,6 +192,7 @@ public class ClothControllerImpl implements ClothController {
                     clothSize.setCloth(item);
                     clothSize.setPrice(s.getPrice());
                     clothSize.setQuantity(s.getQuantity());
+                    clothSize.setLocation(s.getLocation());
                     clothSizeList.add(clothSize);
 
                 }
@@ -334,25 +338,25 @@ public class ClothControllerImpl implements ClothController {
     @Override
     public ResponseEntity<?> searchItemByCode(SearchItemsRequest request) {
         try {
-            int productId = Integer.parseInt(request.getCode().substring(0, 5));
-            String size = request.getCode().substring(5);
-            Cloth cloth= clothRepository.findById(productId).orElse(null);
+
+            String code=request.getCode().trim().substring(0,8);
+            //int productId = Integer.parseInt(request.getCode().substring(0, 5));
+            String size = request.getCode().trim().length()>8 ? request.getCode().trim().substring(8): "";
+            Cloth cloth= clothRepository.findByCode(code.toUpperCase(Locale.ROOT));
             ClothAvailability cla= new ClothAvailability(cloth);
-            cla.setRequestedSize(size);
+            cla.setRequestedSize(size.toUpperCase(Locale.ROOT));
             boolean available=false;
             if(cloth!=null){
-                cla.setLocation(cloth.getLocation());
                 for(SizeRequest sr: cla.getSizes()){
                     if(size.isEmpty()){
                         cla.setRequestedSize(null);
                         cla.setRequestedPrice(null);
                         if(sr.getQuantity()>0){
-                            available= true;
-                            if(cla.getAvailableSizes().isEmpty())
-                                cla.setAvailableSizes(sr.getName());
-                            else cla.setAvailableSizes(cla.getAvailableSizes()+", "+sr.getName());
+                            double price= ( sr.getPrice()/100 )* (double) cloth.getDiscount();
+                            price= sr.getPrice() - price;
+                            sr.setPrice(price);
+                            cla.getAvailableSizes().add(sr);
                         }
-
                     }
                     else if(sr.getName().equalsIgnoreCase(size)){
                         cla.setQuantity(sr.getQuantity());
@@ -363,6 +367,7 @@ public class ClothControllerImpl implements ClothController {
                             double price= ( sr.getPrice()/100 )* (double) cloth.getDiscount();
                             price= sr.getPrice() - price;
                             cla.setRequestedPrice(price);
+                            cla.setLocation(sr.getLocation());
                         }
                         break;
                     }
@@ -382,18 +387,8 @@ public class ClothControllerImpl implements ClothController {
     @Override
     public ResponseEntity<?> searchAllItems(SearchItemsRequest request) {
 
-        Integer productId= null;
         List<Cloth> items= new ArrayList<>();
-        if(request.getTxt()!=null && request.getTxt().matches("\\d+")) {
-            productId = Integer.parseInt(request.getTxt());
-            Cloth cloth= clothRepository.findById(productId).orElse(null);
-            if(cloth!=null){
-                if(cloth.getAvailable())
-                    items.add(cloth);
-                else if(!cloth.getAvailable() && request.getAll()==null)
-                    items.add(cloth);
-            }
-        }else{
+        if(request.getTxt()!=null) {
             items=clothRepository.searchByInput(request.getTxt());
             if(request.getAll()!=null)
                 items= items.stream().filter(Cloth::getAvailable).collect(Collectors.toList());
@@ -410,6 +405,22 @@ public class ClothControllerImpl implements ClothController {
         List<Cloth> items= clothRepository.findByCategoryAndSex(cat,s);
         List<ClothDto> result= items.stream().map(ClothDto::new).collect(Collectors.toList());
         return ResponseEntity.ok(result);
+    }
+
+    @Override
+    public ResponseEntity<?> setProductCode(){
+        List<Cloth> clothes= clothRepository.findAll();
+        clothes= clothes.stream().filter(cl->cl.getCode().length()<8).collect(Collectors.toList());
+        log.info("Setting Product Codes");
+        if(!clothes.isEmpty()){
+            for(Cloth cloth: clothes){
+                String padded= "00000"+cloth.getCode();
+                cloth.setCode(padded.substring(padded.length()-8));
+            }
+            clothRepository.saveAll(clothes);
+        }
+
+        return ResponseEntity.ok(clothes!=null? clothes.size():0);
     }
 
 

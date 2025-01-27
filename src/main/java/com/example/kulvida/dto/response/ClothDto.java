@@ -20,6 +20,7 @@ public class ClothDto {
     private String brand;
     private String location;
     private String category;
+    private String code;
     private List<ClothPicture> pictures;
     private boolean available;
     private List<SizeRequest> sizes=new ArrayList<>();
@@ -35,10 +36,10 @@ public class ClothDto {
         pictures=cloth.getPictures();
         available= cloth.getAvailable();
         brand= cloth.getBrand();
-        location= cloth.getLocation();
+        code= cloth.getCode();
         if(cloth.getClothSizes()!=null){
             for(ClothSize cs: cloth.getClothSizes()){
-                SizeRequest srq=new SizeRequest(cs.getSize().getName(),cs.getQuantity(),cs.getPrice());
+                SizeRequest srq=new SizeRequest(cs.getSize().getName(),cs.getQuantity(),cs.getLocation(),cs.getPrice());
                 sizes.add(srq);
             }
         }

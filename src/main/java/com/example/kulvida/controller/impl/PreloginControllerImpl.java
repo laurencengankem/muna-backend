@@ -103,7 +103,7 @@ public class PreloginControllerImpl implements PreloginController {
     
     @Override
     public boolean resetPassword(@RequestBody PasswordResetRequest request) {
-    	if(userRepo.existsByUsername(request.getEmail())) {
+    	if(userRepo.existsByUsername(request.getEmail()) && !userRepo.findByUsername(request.getEmail()).getRole().getValue().equalsIgnoreCase("OPERATOR")) {
             int max=999999;
             int min=100000;
             Integer random_int = (int)Math.floor(Math.random()*(max-min+1)+min);

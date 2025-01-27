@@ -14,6 +14,7 @@ public class ClothUpdateRequest {
     private String category;
     private String brand;
     private String location;
+    private String code;
     private Sex sex;
     private List<SizeRequest> sizes;
     private Boolean available;

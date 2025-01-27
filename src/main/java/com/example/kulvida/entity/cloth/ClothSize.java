@@ -1,10 +1,8 @@
 package com.example.kulvida.entity.cloth;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -35,4 +33,7 @@ public class ClothSize implements Serializable {
 
     @Column(nullable = false)
     private Double price;
+
+    @Column(nullable = true)
+    private String location;
 }
