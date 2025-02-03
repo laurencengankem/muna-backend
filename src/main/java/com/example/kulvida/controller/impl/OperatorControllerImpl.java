@@ -17,19 +17,20 @@ import com.example.kulvida.entity.cloth.Order;
 import com.example.kulvida.entity.cloth.OrderItem;
 import com.example.kulvida.repository.*;
 import com.example.kulvida.service.JwtUserDetailsService;
-import com.example.kulvida.utils.EmailSenderUtil;
-import com.example.kulvida.utils.PdfUtil;
-import com.example.kulvida.utils.RandomGeneratorUtil;
-import com.example.kulvida.utils.ReceipMunaUtil;
+import com.example.kulvida.utils.*;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -82,6 +83,9 @@ public class OperatorControllerImpl implements OperatorController {
 
     @Autowired
     RandomGeneratorUtil randomGeneratorUtil;
+
+    @Autowired
+    PdfUtilNew pdfUtil;
 
     @Autowired
     private PasswordEncoder bcryptEncoder;
@@ -268,8 +272,22 @@ public class OperatorControllerImpl implements OperatorController {
             }
             order.setTotal(total);
             orderRepository.save(order);
-            String base64= ReceipMunaUtil.generateReceipt(orderItems);
-            return splitBase64(base64,1000);
+            try {
+                byte[] pdfBytes = pdfUtil.generatePOSReceipt(orderItems);
+
+                if (pdfBytes == null) {
+                    return ResponseEntity.internalServerError().body(null);
+                }
+
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=receipt.pdf")
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .body(pdfBytes);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //String base64= ReceipMunaUtil.generateReceipt(orderItems);
+            //return splitBase64(base64,1000);
         }catch (Exception ex){
             log.info(ex.getMessage());
         }
@@ -282,8 +300,22 @@ public class OperatorControllerImpl implements OperatorController {
 
         List<OrderItem> orderItems= orderItemRepository.findByOrderOrderId(orderId);
         if(orderItems!=null && !orderItems.isEmpty()){
-            String base64= ReceipMunaUtil.generateReceipt(orderItems);
-            return splitBase64(base64,1000);
+            //String base64= ReceipMunaUtil.generateReceipt(orderItems);
+            try {
+                byte[] pdfBytes = pdfUtil.generatePOSReceipt(orderItems);
+
+                if (pdfBytes == null) {
+                    return ResponseEntity.internalServerError().body(null);
+                }
+
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=recipt.pdf")
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .body(pdfBytes);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //return splitBase64(base64,1000);
         }
         return null;
     }

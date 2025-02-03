@@ -72,4 +72,14 @@ public class User {
 		this.password = password;
 		this.role = role;
 	}
+
+    public String getFullName(){
+        StringBuilder st= new StringBuilder();
+        if(this.firstName!=null)
+            st.append(this.firstName+ " ");
+        if(this.lastName!=null)
+            st.append(this.lastName);
+
+        return st.toString();
+    }
 }

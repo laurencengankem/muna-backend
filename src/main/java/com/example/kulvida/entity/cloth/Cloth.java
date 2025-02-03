@@ -1,8 +1,6 @@
 package com.example.kulvida.entity.cloth;
 
-import com.example.kulvida.entity.Item;
-import com.example.kulvida.entity.ItemPicture;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -33,7 +31,7 @@ public class Cloth implements Comparable, Serializable {
     private Integer discount=0;
     private Sex sex;
     private String brand;
-    private String location;
+    private String color;
 
     @Column(name = "CODE",unique = true, nullable = true)
     private String code;

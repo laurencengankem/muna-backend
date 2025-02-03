@@ -18,7 +18,7 @@ public class ClothDto {
     private Integer discount=0;
     private Sex sex;
     private String brand;
-    private String location;
+    private String color;
     private String category;
     private String code;
     private List<ClothPicture> pictures;
@@ -31,6 +31,7 @@ public class ClothDto {
         name= cloth.getName();
         description=cloth.getDescription();
         sex= cloth.getSex();
+        color= cloth.getColor();
         discount=cloth.getDiscount();
         category= cloth.getCategory().getName();
         pictures=cloth.getPictures();

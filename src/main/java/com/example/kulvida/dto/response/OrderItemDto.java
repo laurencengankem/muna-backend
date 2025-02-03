@@ -21,6 +21,6 @@ public class OrderItemDto {
         this.quantity= item.getQuantity();
         this.price= item.getPrice();
         this.total= item.getSubTotal();
-        this.code= item.getCloth().getCode();
+        this.code= item.getCloth().getCode()+item.getSize().getName();
     }
 }

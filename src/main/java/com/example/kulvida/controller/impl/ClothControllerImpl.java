@@ -90,6 +90,8 @@ public class ClothControllerImpl implements ClothController {
                 BeanUtils.copyProperties(request,item);
                 if(item.getBrand()!=null)
                     item.setBrand(item.getBrand().toUpperCase(Locale.ROOT));
+                if(item.getColor()!=null)
+                    item.setColor(item.getColor().toUpperCase(Locale.ROOT));
                 if(request.getCategory()!=null){
                     Category category= categoryRepository.findByName(request.getCategory().toUpperCase(Locale.ROOT));
                     if(category==null)
@@ -156,6 +158,8 @@ public class ClothControllerImpl implements ClothController {
             Cloth item= clothRepository.findById(idItem).orElse(null);
             if(request.getAvailable()!=null)
                 item.setAvailable(request.getAvailable());
+            if(request.getColor()!=null)
+                item.setColor(request.getColor().toUpperCase(Locale.ROOT));
             if(request.getName()!=null)
                 item.setName(request.getName());
             if(request.getDescription()!=null)
@@ -342,11 +346,12 @@ public class ClothControllerImpl implements ClothController {
             String code=request.getCode().trim().substring(0,8);
             //int productId = Integer.parseInt(request.getCode().substring(0, 5));
             String size = request.getCode().trim().length()>8 ? request.getCode().trim().substring(8): "";
+            ClothAvailability cla= null;
             Cloth cloth= clothRepository.findByCode(code.toUpperCase(Locale.ROOT));
-            ClothAvailability cla= new ClothAvailability(cloth);
-            cla.setRequestedSize(size.toUpperCase(Locale.ROOT));
             boolean available=false;
-            if(cloth!=null){
+            if(cloth!=null && cloth.getAvailable()){
+                cla= new ClothAvailability(cloth);
+                cla.setRequestedSize(size.toUpperCase(Locale.ROOT));
                 for(SizeRequest sr: cla.getSizes()){
                     if(size.isEmpty()){
                         cla.setRequestedSize(null);
