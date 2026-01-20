@@ -270,7 +270,9 @@ public class UserControllerImpl implements UserController {
             if(cloth!=null){
                 OrderItem orderItem= new OrderItem();
                 orderItem.setOrder(order);
-                orderItem.setCloth(cloth);
+                orderItem.setCloth(cloth.getClothId());
+                orderItem.setClothCode(cloth.getCode());
+                orderItem.setClothName(cloth.getName());
                 orderItem.setDiscount(cloth.getDiscount());
                 if(cloth.getClothSizes()!=null && !cloth.getClothSizes().isEmpty()){
                     List<SizeRequest> sr= cloth.getClothSizes().stream().map(SizeRequest::new).collect(Collectors.toList());

@@ -185,8 +185,8 @@ public class PdfUtil {
             for (OrderItem o : order) {
                 document.add(new com.itextpdf.layout.element.Paragraph(
                         String.format("%-10s %-10s %-5s %10s",
-                                o.getCloth().getName().toLowerCase(Locale.ROOT),
-                                o.getCloth().getCode() + o.getSize().getName(),
+                                o.getClothName().toLowerCase(Locale.ROOT),
+                                o.getClothCode() + o.getSize().getName(),
                                 String.valueOf(o.getQuantity()),
                                 nf.format(o.getPrice()))
                 )
@@ -302,10 +302,10 @@ public class PdfUtil {
         cell.setBackgroundColor(Color.WHITE);
         font = FontFactory.getFont(FontFactory.TIMES_ROMAN, 12);
         for(OrderItem o : order) {
-            cell.setPhrase(new Phrase(String.valueOf(o.getCloth().getCode()+o.getSize().getName()),font));
+            cell.setPhrase(new Phrase(String.valueOf(o.getClothCode()+o.getSize().getName()),font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(String.valueOf(o.getCloth().getName()),font));
+            cell.setPhrase(new Phrase(String.valueOf(o.getClothName()),font));
             table.addCell(cell);
 
             cell.setPhrase(new Phrase(String.valueOf(o.getQuantity()),font));

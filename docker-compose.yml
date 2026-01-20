@@ -1,0 +1,50 @@
+#version: "3.8" no need anymore
+include:
+  - other.yml
+services:
+  muna-backend:
+#    image: muna-backend:1.0
+    build: .
+    user: root #specify the user running the app inside the container. It is not secure to use the root user
+    container_name: muna-backend #set a nome for the containers, can't scale if set
+    hostname: backend # the name the container thinks it has internally.
+    labels:      # use to attach metadata to the container for documentation purposes or for filteringdocke
+      - "maintainer=laurence"
+#    profiles:
+#      - backend
+#    volumes:
+#     - data:/data
+#    post_start:
+#      - command: chown -R /data 1001:1001
+#        user: root
+    ports:
+      - "9000:9000"
+    restart: always
+    depends_on:
+      - muna-db
+    networks:
+      - muna-compose-network
+
+  muna-frontend:
+    image: muna-frontend:1.0
+    ports:
+      - "80:80"
+    restart: always
+    depends_on:
+      - muna-db
+    networks:
+      - muna-compose-network
+
+  muna-db:
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: moun@
+      MYSQL_DATABASE: muna
+    networks:
+      - muna-compose-network
+
+networks:
+  muna-compose-network:

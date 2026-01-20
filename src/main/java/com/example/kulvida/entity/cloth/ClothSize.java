@@ -3,6 +3,7 @@ package com.example.kulvida.entity.cloth;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -30,6 +31,9 @@ public class ClothSize implements Serializable {
     // Additional columns in the join table (quantity and price)
     @Column(nullable = false)
     private Integer quantity;
+
+    @Column(nullable = true)
+    private Integer magasin;
 
     @Column(nullable = false)
     private Double price;

@@ -34,7 +34,7 @@ public class ReceipMunaUtil {
         receipt.append(String.format("%-15s%10s%6s%12s%n", "Item", "Size", "Qty", "Price"));
         Double total=0.0;
         for(OrderItem item: items){
-            String name= item.getCloth().getName().length()>10? item.getCloth().getName().substring(0,10).trim()+"...": item.getCloth().getName();
+            String name= item.getClothName().length()>10? item.getClothName().substring(0,10).trim()+"...": item.getClothName();
             receipt.append(String.format("%-15s%10s%6d%12.2f%n", name, item.getSize().getName(), item.getQuantity(), item.getSubTotal()));
             total+=item.getSubTotal();
         }

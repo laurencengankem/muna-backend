@@ -30,7 +30,7 @@ public class Item implements Comparable{
     private Integer quantity;
 
     @Column(name = "discount")
-    private Integer discount;
+    private Double discount;
 
     @Transient
     private Double discounted;

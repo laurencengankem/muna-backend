@@ -37,6 +37,11 @@ public interface ClothRepository extends JpaRepository<Cloth, Integer> {
 
     Cloth findByCode(String code);
 
+    Cloth findFirstByOrderByClothIdDesc();
+
+    @Query(value = "SELECT MAX(CAST(CODE AS UNSIGNED)) FROM clothes",nativeQuery = true)
+    Integer findNextCode();
+
     @Query("select c from Cloth c where c.code is null")
     List<Cloth> findClothesWithCodeNull();
 }

@@ -32,7 +32,6 @@ public class WebSecurityConfig  {
 	private JwtRequestFilter jwtRequestFilter;
 
 
-
 	@Bean(name="AuthenticationManager")
 	public AuthenticationManager authManager(HttpSecurity http) throws Exception {
 		return http.getSharedObject(AuthenticationManagerBuilder.class).
@@ -43,7 +42,6 @@ public class WebSecurityConfig  {
 
 
 	}
-
 
 	@Bean
 	public SecurityFilterChain filter(HttpSecurity http, @Qualifier("AuthenticationManager")AuthenticationManager auth) throws Exception{

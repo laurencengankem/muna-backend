@@ -15,12 +15,14 @@ public class SizeRequest implements Comparable<SizeRequest>{
     private Integer quantity;
     private String location;
     private Double price;
+    private Integer magasin;
 
 
     public SizeRequest(ClothSize cs){
         this.name=cs.getSize().getName();
         this.quantity= cs.getQuantity();
         this.price= cs.getPrice();
+        this.magasin= cs.getMagasin();
         this.location= cs.getLocation();
 
     }

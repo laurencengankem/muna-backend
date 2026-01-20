@@ -7,15 +7,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 public interface ClothController {
 
-    @PostMapping("admin/uploadPictures")
+    @PostMapping("operator/uploadPictures")
     @CrossOrigin
     ResponseEntity<?> save(@RequestBody FileUploadRequest request);
 
-    @PostMapping("admin/addItem")
+    @PostMapping("operator/addItem")
     @CrossOrigin
     ResponseEntity<?> addItem(@RequestBody AddItemRequest request);
 
@@ -80,9 +81,18 @@ public interface ClothController {
     );
 
 
+
     @GetMapping("item/setCodes")
     @CrossOrigin
     ResponseEntity<?> setProductCode();
+
+    @GetMapping("item/getPics")
+    @CrossOrigin
+    ResponseEntity<?> downloadPics();
+
+    @GetMapping("item/getPicture/{fileName}")
+    @CrossOrigin
+    ResponseEntity<?> getItemPicture(@PathVariable String fileName) throws MalformedURLException;
 
 
 }

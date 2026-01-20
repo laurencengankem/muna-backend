@@ -15,7 +15,7 @@ public class ClothDto {
     private Integer id;
     private String name;
     private String description;
-    private Integer discount=0;
+    private Double discount=0.0;
     private Sex sex;
     private String brand;
     private String color;
@@ -40,7 +40,7 @@ public class ClothDto {
         code= cloth.getCode();
         if(cloth.getClothSizes()!=null){
             for(ClothSize cs: cloth.getClothSizes()){
-                SizeRequest srq=new SizeRequest(cs.getSize().getName(),cs.getQuantity(),cs.getLocation(),cs.getPrice());
+                SizeRequest srq=new SizeRequest(cs.getSize().getName(),cs.getQuantity(),cs.getLocation(),cs.getPrice(),cs.getMagasin());
                 sizes.add(srq);
             }
         }

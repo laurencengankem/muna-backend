@@ -28,12 +28,14 @@ public class Cloth implements Comparable, Serializable {
     private String name;
     private String description;
 
-    private Integer discount=0;
+    @Column(name="promotion", nullable = false)
+    private Double discount=0.0;
+
     private Sex sex;
     private String brand;
     private String color;
 
-    @Column(name = "CODE",unique = true, nullable = true)
+    @Column(name = "CODE",unique = true, nullable = false)
     private String code;
 
     @ManyToOne

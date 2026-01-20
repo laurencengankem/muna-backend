@@ -7,6 +7,8 @@ import com.example.kulvida.dto.response.AddItemListResponse;
 import com.example.kulvida.dto.response.ClothAvailability;
 import com.example.kulvida.dto.response.ClothDto;
 import com.example.kulvida.dto.response.FileUploadResponse;
+import com.example.kulvida.entity.ItemPicture;
+import com.example.kulvida.entity.UserItem;
 import com.example.kulvida.entity.cloth.*;
 import com.example.kulvida.repository.*;
 import com.google.gson.Gson;
@@ -15,13 +17,28 @@ import io.imagekit.sdk.models.FileCreateRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -53,20 +70,41 @@ public class ClothControllerImpl implements ClothController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private UserItemRepository userItemRepository;
+
+    @Value("${ItemPictureDir}")
+    private String picDir;
+
+    @Value("${ImageBaseUrl}")
+    private String  picBaseUrl;
+
 
     @Override
     public ResponseEntity<?> save(@RequestBody FileUploadRequest request){
-        log.info("upload call received");
         String url=null;
         try{
             FileCreateRequest fileCreateRequest= new FileCreateRequest(request.getImage(),request.getName());
-            FileUploadResponse response= new FileUploadResponse();
             Cloth item= clothRepository.findById(request.getId()).orElse(null);
-            if(item!=null){
+            /*if(item!=null){
                 ClothPicture itemPicture= new ClothPicture();
                 url =imageKit.upload(fileCreateRequest).getUrl();
                 log.info("image url: {}",url);
                 itemPicture.setUrl(url);
+                item.getPictures().add(itemPicture);
+                clothRepository.save(item);
+                return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
+            }*/
+            if(item!=null){
+                log.info(request.getImage());
+                String fileName= item.getPictures().isEmpty()?
+                        item.getCode().toLowerCase(Locale.ROOT): item.getCode().toLowerCase(Locale.ROOT)+"_"+item.getPictures().size();
+                fileName=this.saveImage(request.getImage(),fileName);
+                ClothPicture itemPicture= new ClothPicture();
+                itemPicture.setUrl(picBaseUrl+fileName);
                 item.getPictures().add(itemPicture);
                 clothRepository.save(item);
                 return new ResponseEntity<Boolean>(Boolean.TRUE, HttpStatus.OK);
@@ -77,7 +115,31 @@ public class ClothControllerImpl implements ClothController {
         }
 
         return new ResponseEntity<Boolean>(Boolean.FALSE, HttpStatus.OK);
-        //imageKit.deleteFile();
+    }
+
+    private String saveImage(String base64Image, String fileName) throws Exception{
+        if (!base64Image.startsWith("data:image")) {
+            throw new Exception("Invalid image format");
+        }
+
+        String[] parts = base64Image.split(",");
+        if (parts.length != 2) {
+            throw new Exception("Malformed base64 string");
+        }
+
+        String extension = parts[0].contains("jpeg") ? "jpg" : "png";
+        byte[] imageBytes = Base64.getDecoder().decode(parts[1]);
+
+        File directory = new File(picDir);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+        File imageFile = new File(picDir, fileName+"."+ extension);
+        try (FileOutputStream fos = new FileOutputStream(imageFile)) {
+            fos.write(imageBytes);
+        }
+        return fileName+"."+ extension;
     }
 
     @Override
@@ -115,6 +177,7 @@ public class ClothControllerImpl implements ClothController {
                         savedSizes.add(size.getName());
                         ClothSize clothSize= new ClothSize();
                         clothSize.setSize(size);
+                        clothSize.setMagasin(s.getMagasin());
                         clothSize.setCloth(item);
                         clothSize.setPrice(s.getPrice());
                         clothSize.setQuantity(s.getQuantity());
@@ -123,7 +186,7 @@ public class ClothControllerImpl implements ClothController {
                     }
                     clothSizeRepository.saveAll(clothSizeList);
                 }
-                return new ResponseEntity<Boolean>(Boolean.TRUE,HttpStatus.OK);
+                return new ResponseEntity<Integer>(item.getClothId(),HttpStatus.OK);
             }catch (Exception ex){
                 log.info(ex.getMessage());
             }
@@ -142,8 +205,9 @@ public class ClothControllerImpl implements ClothController {
         log.info("Cloth to delete {}"+idItem);
         if(clothRepository.existsById(idItem)) {
             Cloth item= clothRepository.findById(idItem).orElse(null);
-            item.setAvailable(false);
-            clothRepository.save(item);
+            List<UserItem> userItems=   userItemRepository.findByItem(item);
+            userItemRepository.deleteAll(userItems);
+            clothRepository.delete(item);
             return new ResponseEntity<Boolean>(Boolean.TRUE,HttpStatus.OK);
         }
 
@@ -196,6 +260,7 @@ public class ClothControllerImpl implements ClothController {
                     clothSize.setCloth(item);
                     clothSize.setPrice(s.getPrice());
                     clothSize.setQuantity(s.getQuantity());
+                    clothSize.setMagasin(s.getMagasin());
                     clothSize.setLocation(s.getLocation());
                     clothSizeList.add(clothSize);
 
@@ -343,9 +408,9 @@ public class ClothControllerImpl implements ClothController {
     public ResponseEntity<?> searchItemByCode(SearchItemsRequest request) {
         try {
 
-            String code=request.getCode().trim().substring(0,8);
+            String code=request.getCode().trim().substring(0,5);
             //int productId = Integer.parseInt(request.getCode().substring(0, 5));
-            String size = request.getCode().trim().length()>8 ? request.getCode().trim().substring(8): "";
+            String size = request.getCode().trim().length()>5 ? request.getCode().trim().substring(5): "";
             ClothAvailability cla= null;
             Cloth cloth= clothRepository.findByCode(code.toUpperCase(Locale.ROOT));
             boolean available=false;
@@ -412,21 +477,98 @@ public class ClothControllerImpl implements ClothController {
         return ResponseEntity.ok(result);
     }
 
-    @Override
-    public ResponseEntity<?> setProductCode(){
-        List<Cloth> clothes= clothRepository.findAll();
-        clothes= clothes.stream().filter(cl->cl.getCode().length()<8).collect(Collectors.toList());
-        log.info("Setting Product Codes");
-        if(!clothes.isEmpty()){
-            for(Cloth cloth: clothes){
-                String padded= "00000"+cloth.getCode();
-                cloth.setCode(padded.substring(padded.length()-8));
-            }
-            clothRepository.saveAll(clothes);
-        }
 
-        return ResponseEntity.ok(clothes!=null? clothes.size():0);
+    @Override
+    public ResponseEntity<?> getItemPicture(String fileName) throws MalformedURLException {
+        Path imagePath = Paths.get(picDir).resolve(fileName).normalize();
+        Resource resource = new UrlResource(imagePath.toUri());
+
+        if (!resource.exists() || !resource.isReadable()) {
+            return ResponseEntity.notFound().build();
+        }
+        String contentType = getContentType(fileName).orElse(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileName + "\"")
+                .body(resource);
     }
 
+    private Optional<String> getContentType(String filename) {
+        if (filename.endsWith(".png")) {
+            return Optional.of(MediaType.IMAGE_PNG_VALUE);
+        } else if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
+            return Optional.of(MediaType.IMAGE_JPEG_VALUE);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public ResponseEntity<?> setProductCode(){
+        List<OrderItem> orderItems= orderItemRepository.findAll();
+
+        List<Cloth> clothes= clothRepository.findAll();
+
+        List<ClothSize> clothSizes= clothSizeRepository.findAll();
+
+        clothSizes.stream().filter(cs -> cs.getMagasin()==null).forEach(cs -> cs.setMagasin(0));
+
+        clothSizeRepository.saveAllAndFlush(clothSizes);
+
+
+        /*clothes.forEach(cloth -> {
+            if(cloth.getCode().length()==8){
+                cloth.setCode("0"+cloth.getCode().substring(4));
+            }
+            else{
+                String padded= "0000"+cloth.getCode();
+                cloth.setCode(padded.substring(padded.length()-5));
+            }
+        });
+        clothRepository.saveAll(clothes);
+
+        for(OrderItem order: orderItems){
+            Cloth cloth= clothRepository.findById(order.getCloth()).orElse(null);
+            if(cloth!=null){
+                order.setClothName(cloth.getName());
+                order.setClothCode(cloth.getCode());
+            }
+        }
+
+        orderItemRepository.saveAllAndFlush(orderItems);*/
+
+        return ResponseEntity.ok(clothSizes.size());
+    }
+
+    @Override
+    public ResponseEntity<?> downloadPics(){
+        List<ClothPicture> pictures= clothPictureRepository.findAll();
+
+        for(ClothPicture pic: pictures){
+            if(pic.getUrl()!=null){
+                String[] parts= pic.getUrl().split("/");
+                String fileName = pic.getUrl().split("/")[parts.length-1];
+                try {
+                    downloadImage(pic.getUrl(), picDir, fileName);
+                    log.info("Download complete: " + picDir + "/" + fileName);
+                    pic.setUrl(picBaseUrl+fileName);
+                } catch (IOException e) {
+                    log.error(e.getMessage());
+                }
+            }
+        }
+        clothPictureRepository.saveAllAndFlush(pictures);
+
+        return ResponseEntity.ok(pictures.size());
+    }
+
+    private void downloadImage(String imageUrl, String saveDir, String fileName) throws IOException {
+        URL url = new URL(imageUrl);
+        Path filePath = Paths.get(saveDir, fileName);
+        Files.createDirectories(Paths.get(saveDir));
+
+        try (InputStream in = url.openStream()) {
+            Files.copy(in, filePath, StandardCopyOption.REPLACE_EXISTING);
+        }
+    }
 
 }

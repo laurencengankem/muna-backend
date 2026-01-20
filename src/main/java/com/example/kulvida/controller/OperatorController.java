@@ -2,13 +2,13 @@ package com.example.kulvida.controller;
 
 import com.example.kulvida.dto.request.SendEmailRequest;
 import com.example.kulvida.dto.request.ValidateCheckoutRequest;
-import com.example.kulvida.dto.response.OrderDto;
-import com.example.kulvida.dto.response.OrderItemDto;
-import com.example.kulvida.dto.response.ValidateCheckoutResponse;
+import com.example.kulvida.dto.response.*;
 import com.example.kulvida.entity.User;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OperatorController {
 
@@ -46,11 +46,32 @@ public interface OperatorController {
 
     @GetMapping("/operator/getOrderItems/{orderId}")
     @CrossOrigin
-    List<OrderItemDto> getOrderItems(@PathVariable String orderId);
+    Map<String,Object> getOrderItems(@PathVariable String orderId);
 
     @GetMapping("/operator/getOrderList")
     @CrossOrigin
     List<OrderDto> getAllOrders();
+
+    @GetMapping("/operator/getNextCode")
+    @CrossOrigin
+    ResponseEntity<NextCodeResponse> getNextCode();
+
+
+    @PostMapping("/operator/testImage")
+    @CrossOrigin
+    Object generateImage(@RequestBody ValidateCheckoutRequest request);
+
+
+    @GetMapping("/admin/delete-order/{orderId}")
+    @CrossOrigin
+    Object deleteOrder(@PathVariable String orderId);
+
+    @GetMapping("/item/getDashboardStats")
+    @CrossOrigin
+    DashboardCountResponse getDashboardStats();
+
+
+
 
 
 

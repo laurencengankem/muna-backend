@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 public class ValidateCheckoutItem {
 
     private Integer id;
+    private String code;
     private String name;
     private Integer quantity;
     private Double price;

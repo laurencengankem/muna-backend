@@ -4,23 +4,24 @@ package com.example.kulvida.entity.cloth;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ORDER_ITEMS")
+@Table(name = "UPDATED_ORDER_ITEMS")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderItem {
+public class UpdatedOrderItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    @JoinColumn(name = "order_update_id", nullable = false)
+    private OrderUpdate orderUpdate;
 
     @Column(name = "cloth_id")
     private Integer cloth;
@@ -47,5 +48,22 @@ public class OrderItem {
 
     @Column(name = "subtotal")
     private Double subTotal;
+
+    @Column(name = "update_type")
+    private String updateType;
+
+
+
+    public UpdatedOrderItem(OrderItem item, OrderUpdate orderUpdate){
+        this.orderUpdate = orderUpdate;
+        this.cloth = item.getCloth();
+        this.clothName= item.getClothName();
+        this.clothCode = item.getClothCode();
+        this.quantity = item.getQuantity();
+        this.price = item.getPrice();
+        this.size = item.getSize();
+        this.discount = item.getDiscount();
+        this.subTotal = item.getSubTotal();
+    }
 
 }

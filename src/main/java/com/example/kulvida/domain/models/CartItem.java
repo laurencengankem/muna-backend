@@ -14,7 +14,7 @@ public class CartItem {
     private String photo;
     private Double price;
     private Integer quantity;
-    private Integer discount;
+    private Double discount;
     private Double discounted;
     private Double total;
     private List<SizeRequest> sizes;

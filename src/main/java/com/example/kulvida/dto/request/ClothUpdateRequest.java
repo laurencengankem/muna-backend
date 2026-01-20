@@ -10,7 +10,7 @@ public class ClothUpdateRequest {
 
     private String name;
     private String description;
-    private Integer discount;
+    private Double discount;
     private String category;
     private String brand;
     private String color;

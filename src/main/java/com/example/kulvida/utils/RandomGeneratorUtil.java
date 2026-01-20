@@ -20,4 +20,6 @@ public class RandomGeneratorUtil {
         }
         return sb.toString().toUpperCase(Locale.ROOT);
     }
+
+
 }
