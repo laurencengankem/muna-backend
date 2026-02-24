@@ -11,6 +11,7 @@ public class ClothUpdateRequest {
     private String name;
     private String description;
     private Double discount;
+    private Double cost;
     private String category;
     private String brand;
     private String color;

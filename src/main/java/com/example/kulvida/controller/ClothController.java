@@ -95,4 +95,12 @@ public interface ClothController {
     ResponseEntity<?> getItemPicture(@PathVariable String fileName) throws MalformedURLException;
 
 
+    @GetMapping("admin/editPicsUrl/{oldIp}/{newIp}")
+    @CrossOrigin
+    ResponseEntity<?> editPicsUrl(
+            @PathVariable String oldIp,
+            @PathVariable String newIp
+    );
+
+
 }

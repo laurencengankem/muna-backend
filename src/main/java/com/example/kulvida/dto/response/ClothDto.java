@@ -25,6 +25,7 @@ public class ClothDto {
     private boolean available;
     private List<SizeRequest> sizes=new ArrayList<>();
     private boolean outOfStock=false;
+    private Double cost;
 
     public ClothDto(Cloth cloth){
         id=cloth.getClothId();
@@ -38,6 +39,7 @@ public class ClothDto {
         available= cloth.getAvailable();
         brand= cloth.getBrand();
         code= cloth.getCode();
+        cost = cloth.getCost();
         if(cloth.getClothSizes()!=null){
             for(ClothSize cs: cloth.getClothSizes()){
                 SizeRequest srq=new SizeRequest(cs.getSize().getName(),cs.getQuantity(),cs.getLocation(),cs.getPrice(),cs.getMagasin());

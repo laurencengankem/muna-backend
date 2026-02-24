@@ -52,6 +52,8 @@ public class Cloth implements Comparable, Serializable {
     @Column(name = "available")
     private Boolean available=true;
 
+    @Column(name = "COST")
+    private Double cost;
 
     @Column(name = "creation_date")
     @Temporal(TemporalType.TIMESTAMP)

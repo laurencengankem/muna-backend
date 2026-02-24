@@ -13,6 +13,7 @@ public class AddItemRequest {
 
     private String name;
     private String description;
+    private Double cost;
     private double price;
     private Integer quantity;
     private String category;

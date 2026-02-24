@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -236,6 +237,8 @@ public class ClothControllerImpl implements ClothController {
                 item.setSex(request.getSex());
             if(request.getCode()!=null)
                 item.setCode(request.getCode());
+            if(request.getCost()!=null)
+                item.setCost(request.getCost());
             if(request.getCategory()!=null){
                 Category category= categoryRepository.findByName(request.getCategory().toUpperCase(Locale.ROOT));
                 if(category==null){
@@ -493,6 +496,7 @@ public class ClothControllerImpl implements ClothController {
                 .body(resource);
     }
 
+
     private Optional<String> getContentType(String filename) {
         if (filename.endsWith(".png")) {
             return Optional.of(MediaType.IMAGE_PNG_VALUE);
@@ -570,5 +574,38 @@ public class ClothControllerImpl implements ClothController {
             Files.copy(in, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
     }
+
+    @Override
+    public ResponseEntity<?> editPicsUrl(String oldIp, String newIp) {
+
+        if (!isValidIp(oldIp) || !isValidIp(newIp)) {
+            return ResponseEntity.badRequest().body("Wrong IP format");
+        }
+
+        List<ClothPicture> pictures = clothPictureRepository.findAll();
+
+        List<ClothPicture> updatedPictures = pictures.stream()
+                .filter(pic -> pic.getUrl() != null && pic.getUrl().contains(oldIp))
+                .peek(pic -> pic.setUrl(pic.getUrl().replace(oldIp, newIp)))
+                .collect(Collectors.toList());
+
+        clothPictureRepository.saveAll(updatedPictures);
+
+        return ResponseEntity.ok(
+                updatedPictures.size() + " pictures updated successfully"
+        );
+    }
+
+
+    private boolean isValidIp(String ip){
+        try {
+            InetAddress.getByName(ip);
+            return true;
+        } catch (Exception e){
+            return false;
+        }
+    }
+
+
 
 }
