@@ -23,7 +23,7 @@ spring:
             enable: true
 
   datasource:
-    url: jdbc:mysql://localhost:3306/muna
+    url: jdbc:mysql://85.215.73.94:3306/muna
     #url: jdbc:mysql://localhost:3306/kulvida
     username: root
     #password: root
@@ -39,6 +39,11 @@ spring:
     properties:
       hibernate:
         dialect : org.hibernate.dialect.MySQL5InnoDBDialect
+
+#ItemPictureDir: C:/Users/laure/Desktop/photos
+#ImageBaseUrl: http://localhost:9000/item/getPicture/
+ItemPictureDir: /home/muna/pictures/
+ImageBaseUrl: http://85.215.73.94/api/item/getPicture/
 
 
 #paypal config
@@ -59,3 +64,6 @@ logging:
   logback:
     rollingpolicy:
       file-name-pattern: /root/logs/kulvida.%d{yyyy-MM-dd}.%i.log
+
+
+
